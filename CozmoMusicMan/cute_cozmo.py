@@ -1,11 +1,39 @@
 import cozmo
 import time
+import asyncio
 
-#def hit(robot: cozmo.robot.Robot, speed=5):
+from enum import Enum
+
+from cozmo.util import degrees, distance_mm
+
+'''
+Goes in the trigonometric way
+'''
+class Dir(Enum):
+    NORTH = 0
+    WEST = 1
+    SOUTH = 2
+    EAST = 3
 
 class CuteCozmo:
+
     def __init__(self, robot: cozmo.robot.Robot):
         self.robot = robot
+
+    def lift_a_cube(self):
+        look_around = self.robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+        cube = None
+        try:
+            cube = self.robot.world.wait_for_observed_light_cube(timeout=30)
+            print("Found cube: %s" % cube)
+        except asyncio.TimeoutError:
+            print("Didn't find a cube")
+            return
+        finally:
+            # whether we find it or not, we want to stop the behavior
+            look_around.stop()
+        #self.robot.go_to_object(cube, distance_mm(70.0)).wait_for_completed()
+        self.robot.pickup_object(cube).wait_for_completed()
 
     def hit(self):
         self.robot.set_lift_height(0,duration=0.15).wait_for_completed()
@@ -15,14 +43,10 @@ class CuteCozmo:
         
     def armsDown(self, speed=5):
         self.robot.set_lift_height(0).wait_for_completed()
-        
-
 
 def cozmo_program(robot: cozmo.robot.Robot):
     cute = CuteCozmo(robot)
-    for i in range(2):
-        cute.armsUp()
-        cute.hit()
-
-
+    cute.armsDown()
+    cute.lift_a_cube()
+        
 cozmo.run_program(cozmo_program)
