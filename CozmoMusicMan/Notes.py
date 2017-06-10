@@ -30,19 +30,10 @@ class Notes(CozmoSingleton):
     def get_cube_number(self, note: int):
         if self.simple_mode:
             return note % 3
-        mod = note % 7
+        mod = note % 8
         if mod == 0 or mod == 1:
             return 0
         if mod == 2 or mod == 3 or mod == 4:
             return 1
-        if mod == 5 or mod == 6:
+        if mod == 5 or mod == 6 or mod == 7:
             return 2
-"""
-    def lightning_cube(self, cube, color):
-        cube.set_lights(color)
-
-    def play_sound(self, note: int):
-        if note < 1 or note > 88:
-            return
-        self.sound.play(note)
-"""

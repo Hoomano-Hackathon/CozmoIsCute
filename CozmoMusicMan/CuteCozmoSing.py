@@ -73,10 +73,14 @@ class _CuteCozmoSing:
     def light_cube(self, cube_index):
         self.cubes[cube_index].set_lights(self.lights[cube_index])
 
+
+
     # make Cozmo face a certain direction
     def face(self, i):
-        self.robot.turn_in_place(Angle(self.facing - i)).wait_for_completed()
+        self.robot.turn_in_place(Angle((self.facing - i)*0.5)).wait_for_completed()
         self.facing = i
+
+
 
     def lift_a_cube(self):
         look_around = self.robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
@@ -100,7 +104,7 @@ class CozmoSingleton:
     def __init__(self, robot: cozmo.robot.Robot):
         if not CozmoSingleton.singleton:
             CozmoSingleton.singleton = _CuteCozmoSing(robot)
-        self.robot = CozmoSingleton.singleton
+        self.robot = CozmoSingleton.singleton.robot
         self.sound = CozmoSingleton.singleton.sound
         self.facing = CozmoSingleton.singleton.facing
         self.lights = CozmoSingleton.singleton.lights

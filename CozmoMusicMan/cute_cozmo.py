@@ -1,7 +1,5 @@
 import cozmo
-import time
-import asyncio
-import math
+from cozmo.util import Angle
 
 from enum import Enum
 import pygame
@@ -9,8 +7,6 @@ import threading
 from queue import Queue
 from CuteCozmoSing import CozmoSingleton
 from Notes import Notes
-
-class CuteCozmo(CozmoSingleton):
 
 '''
 Goes in the trigonometric way
@@ -20,6 +16,7 @@ class Dir(Enum):
     WEST = 1
     SOUTH = 2
     EAST = 3
+
 
 class CuteCozmo(CozmoSingleton):
     def __init__(self, robot: cozmo.robot.Robot):
@@ -77,6 +74,20 @@ class CuteCozmo(CozmoSingleton):
         # if playedNote == note:
         #     return True
         # return False
+
+    def face_cube(self, i, wait=True):
+        angle = (self.facing - i) * 0.5
+        action = self.robot.turn_in_place(Angle((self.facing - i)*0.5))
+        if wait:
+            action.wait_for_completed()
+        self.facing = i
+        return action
+
+    # make Cozmo face a certain direction
+    def face_note(self, i, wait=True):
+        cubeToFace = self.cube_from_note(i)
+        print('note', i, '-> cube', cubeToFace)
+        return self.face_cube(cubeToFace, wait)
 
 
 def cozmo_program(robot: cozmo.robot.Robot):
