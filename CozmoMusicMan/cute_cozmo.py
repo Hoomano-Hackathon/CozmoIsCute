@@ -37,6 +37,7 @@ class CuteCozmo(CozmoSingleton):
         else:
             print('no notes in instance !')
 
+
     # light a certain cube with the correct color
     def light_led(self, led_index):
         nb_notes = len(self.notes)
@@ -49,7 +50,15 @@ class CuteCozmo(CozmoSingleton):
             self.cubes[cube_index].set_lights(light)
         self.robot.set_all_backpack_lights(light)
 
+    def wait_for_partition(self, partition: [int], timeout=5):
+        for note in partition:
+            if not self.wait_for_note(note):
+                return False
+        return True
+
     def wait_for_note(self, note, timeout=5):
+        if note == -1:
+            return True
         global q
         # empty the queue
         print('before :', q)
@@ -66,12 +75,12 @@ class CuteCozmo(CozmoSingleton):
         # otherwise, return True
         print('waiting for note', note)
         # code to receive note from MainThread
-        print('pre get')
+        #print('pre get')
         try:
             playedNote = q.get(timeout=timeout)
         except:
             return False
-        print('post get')
+        #print('post get')
         return playedNote == note
         # if playedNote == note:
         #     return True
@@ -79,13 +88,58 @@ class CuteCozmo(CozmoSingleton):
 
 
 def cozmo_program(robot: cozmo.robot.Robot):
+    # dire_bonjour+s etup
     cute = CuteCozmo(robot)
-    if cute.wait_for_note(1):
-        print('content !')
-        cute.robot.play_anim_trigger(cozmo.anim.Triggers.OnSpeedtapGameCozmoWinLowIntensity).wait_for_completed()
-    else:
-        print('fâché !')
-        cute.robot.play_anim_trigger(cozmo.anim.Triggers.MemoryMatchPlayerLoseHandSolo).wait_for_completed()
+    
+    # demo gamme
+    for i in range(8):
+        cute.play_note(i)
+    
+    # TODO Animation content, je t'invite a continuer
+    #Partie jouer mélodie simple
+    melodie = [1,4,7]
+    clair_de_lune = [0,0,0,1,2,1,0,2,1,1,0] # points bonus si tu devines la mélodie à partir des ints
+
+    user_succeded = False
+    while not user_succeded:
+        cute.play_partition(melodie)
+        # TODO animation "à toi"
+        user_succeded = cute.wait_for_partition(melodie)
+        if user_succeded:
+            # TODO animation "bravo"
+            break
+        else:
+            pass
+            # TODO animation "tocard"
+    
+    # jouer mélodie complexe
+    cute.play_partition(clair_de_lune)
+    # TODO animation "ok fin de démo"
+    user_succeded = False
+    taille_groupe = 4
+    while not user_succeded:
+        taille_ensemble = taille_groupe
+        while taille_ensemble <= len(clair_de_lune):
+            cute.play_partition(clair_de_lune[:taille_ensemble])
+            # TODO animation "à toi"
+            if not cute.wait_for_partition(clair_de_lune[:taille_ensemble]):
+                break
+            elif taille_ensemble == len(clair_de_lune):
+                user_succeded = True
+                break
+            elif len(clair_de_lune) - taille_ensemble <= taille_groupe:
+                taille_ensemble = len(clair_de_lune)
+            else:
+                taille_ensemble += taille_groupe
+
+
+            
+    # if cute.wait_for_note(1):
+    #     print('content !')
+    #     cute.robot.play_anim_trigger(cozmo.anim.Triggers.OnSpeedtapGameCozmoWinLowIntensity).wait_for_completed()
+    # else:
+    #     print('fâché !')
+    #     cute.robot.play_anim_trigger(cozmo.anim.Triggers.MemoryMatchPlayerLoseHandSolo).wait_for_completed()
     # cute.play_partition([0, 1, 2, 3, 4, 5, 6, 7])
     # cute.play_partition([0, 0, 0, 1, 2, -1, 1, 0, 2, 1, 1, 0])
 
