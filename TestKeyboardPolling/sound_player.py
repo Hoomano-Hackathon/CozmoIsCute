@@ -10,9 +10,8 @@ class Sound:
         pygame.mixer.pre_init()
         dir_path = os.path.dirname(os.path.realpath(__file__))
         self.s = []
-        self.s.append(pygame.mixer.Sound(dir_path + "\\Sound\\1.wav"))
-        self.s.append(pygame.mixer.Sound(dir_path + "\\Sound\\2.wav"))
-        self.s.append(pygame.mixer.Sound(dir_path + "\\Sound\\3.wav"))
+        for filename in os.listdir(os.path.join(dir_path, "Sound")):
+            self.s.append(pygame.mixer.Sound(os.path.join(dir_path, "Sound", filename)))
 
     def play(self, id, wait=True):
         self.s[id].play()

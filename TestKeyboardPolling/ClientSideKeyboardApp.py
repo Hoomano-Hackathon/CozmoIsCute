@@ -30,15 +30,18 @@ basicFont = pygame.font.SysFont(None, 48)
 # draw the white background onto the surface
 windowSurface.fill(WHITE)
 
-# draw the "keys" on the canvas
-rect = pygame.draw.rect(windowSurface, BLUE, (20, 20, 40, 40))
-rect_dict["z"] = [rect, 0]
+letters = "zqsdfg"
 
-rect = pygame.draw.rect(windowSurface, BLUE, (80, 20, 40, 40))
+# draw the "keys" on the canvas
+for num in range(0,6):
+    rect = pygame.draw.rect(windowSurface, BLUE, (20+60*num, 20, 40, 40))
+    rect_dict[letters[num]] = [rect, num]
+
+"""rect = pygame.draw.rect(windowSurface, BLUE, (80, 20, 40, 40))
 rect_dict["q"] = [rect, 1]
 
 rect = pygame.draw.rect(windowSurface, BLUE, (140, 20, 40, 40))
-rect_dict["s"] = [rect, 2]
+rect_dict["s"] = [rect, 2]"""
 
 
 # pygame.draw.rect(windowSurface, BLUE, (rect + 20, rect + 20, 40, 40))
@@ -62,21 +65,30 @@ while True:
     for event in pygame.event.get():
         pressed = pygame.key.get_pressed()
         if pressed[pygame.K_w]:
-            print("w is pressed")
             rectProp = rect_dict["z"]
             windowSurface.fill(RED, rectProp[0])
             soundPlayer.play(rectProp[1], False)
         elif pressed[pygame.K_a]:
-            print("a is pressed")
             rectProp = rect_dict["q"]
             windowSurface.fill(RED, rectProp[0])
             soundPlayer.play(rectProp[1], False)
         elif pressed[pygame.K_s]:
-            print("")
             rectProp = rect_dict["s"]
             windowSurface.fill(RED, rectProp[0])
             soundPlayer.play(rectProp[1], False)
+        elif pressed[pygame.K_d]:
+            rectProp = rect_dict["d"]
+            windowSurface.fill(RED, rectProp[0])
+            soundPlayer.play(rectProp[1], False)
+        elif pressed[pygame.K_f]:
+            rectProp = rect_dict["f"]
+            windowSurface.fill(RED, rectProp[0])
+            soundPlayer.play(rectProp[1], False)
         elif pressed[pygame.K_g]:
+            rectProp = rect_dict["g"]
+            windowSurface.fill(RED, rectProp[0])
+            soundPlayer.play(rectProp[1], False)
+        elif pressed[pygame.K_p]:
             pygame.quit()
             sys.exit()
 

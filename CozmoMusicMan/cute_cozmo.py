@@ -7,6 +7,7 @@ from cozmo.util import degrees, distance_mm, Angle
 
 from sound_player import Sound
 import pygame
+import threading
 
 '''
 Goes in the trigonometric way
@@ -18,9 +19,9 @@ class Dir(Enum):
     EAST = 3
 
 class CuteCozmo:
-
     def __init__(self, robot: cozmo.robot.Robot):
         self.robot = robot
+        self.sound = Sound()
         self.facing = 1
         self.notes = [20,22,24]
         self.colors = [
@@ -56,6 +57,17 @@ class CuteCozmo:
         for cube in self.cubes:
             cube.set_lights(cozmo.lights.off_light)
 
+    # quickly shove the lift down
+    def hit(self):
+        self.robot.set_lift_height(1, 500, 20).wait_for_completed()
+        return self.robot.set_lift_height(0, 500, 20)
+
+    def armsUp(self, speed=5):
+        self.robot.set_lift_height(1).wait_for_completed()
+
+    def armsDown(self, speed=5):
+        self.robot.set_lift_height(0).wait_for_completed()
+
     # light a certain cube with the correct color
     def light_cube(self, cube_index):
         self.cubes[cube_index].set_lights(self.colors[cube_index])
@@ -70,8 +82,10 @@ class CuteCozmo:
                 noteToPlay = -1
             self.notePlaying = noteToPlay
             while True: # hold on to your butts, we're gonna do a "do ... while" in python !
+                action = self.hit()
                 self.light_cube(toPlay)
-                sound.play(noteToPlay)
+                self.sound.play(noteToPlay, False)
+                action.wait_for_completed()
                 self.cubes[toPlay].set_lights(cozmo.lights.off_light)
                 if not incremental or self.wait_for_note(noteToPlay):
                     break
@@ -105,19 +119,11 @@ class CuteCozmo:
         #self.robot.go_to_object(cube, distance_mm(70.0)).wait_for_completed()
         self.robot.pickup_object(cube).wait_for_completed()
 
-    # quickly shove the lift down
-    def hit(self):
-        self.robot.set_lift_height(0,duration=0.15).wait_for_completed()
-
-    def armsUp(self, speed=5):
-        self.robot.set_lift_height(1).wait_for_completed()
-        
-    def armsDown(self, speed=5):
-        self.robot.set_lift_height(0).wait_for_completed()
-
 def cozmo_program(robot: cozmo.robot.Robot):
     cute = CuteCozmo(robot)
     cute.setup()
+    #cute.hit()
+    cute.hit().wait_for_completed()
     cute.play([0,0,0,1,2,-1,1,0,2,1,1,0])
 
 def setup_pygame():
@@ -125,6 +131,6 @@ def setup_pygame():
     windowSurface = pygame.display.set_mode((500, 400), 0, 32)
     pygame.display.update()
 
-sound = Sound()
-setup_pygame()
-cozmo.run_program(cozmo_program)
+class Cozmo_thread(threading.Thread):
+    def run(self):
+        cozmo.run_program(cozmo_program)
