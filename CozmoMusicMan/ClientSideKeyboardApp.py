@@ -82,7 +82,7 @@ class KeyboardApp ():
                         print('putting', key, 'in queue')
                         queue.put(self.key_codes.index(key))
 
-                    if pressed[pygame.K_p]:
+                    if pressed[pygame.K_ESCAPE]:
                         self.stop()
 
                 pygame.display.update()
