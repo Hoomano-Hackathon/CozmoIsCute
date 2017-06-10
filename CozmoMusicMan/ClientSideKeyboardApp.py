@@ -28,20 +28,18 @@ class KeyboardApp ():
         self.windowSurface = pygame.display.set_mode((500, 400), 0, 32)
         pygame.display.set_caption('Cozmo is cute')
 
-        self.notes = [20, 22, 24, 26, 28, 30]
-
         # set up fontsz
         basicFont = pygame.font.SysFont(None, 48)
 
         # draw the white background onto the surface
         self.windowSurface.fill(WHITE)
 
-        letters = "zqsdfg"
+        letters = "zqsdfgUD"
 
         # draw the "keys" on the canvas
-        for num in range(0,6):
+        for num in range(0,8):
             rect = pygame.draw.rect(self.windowSurface, BLUE, (20+60*num, 20, 40, 40))
-            self.rect_dict[letters[num]] = [rect, self.notes[num]]
+            self.rect_dict[letters[num]] = [rect, num]
 
         """rect = pygame.draw.rect(windowSurface, BLUE, (80, 20, 40, 40))
         rect_dict["q"] = [rect, 1]
@@ -76,21 +74,47 @@ class KeyboardApp ():
             # Check current key presses
             for event in pygame.event.get():
                 pressed = pygame.key.get_pressed()
-                for (key,toinput) in [(pygame.K_w,"z"),(pygame.K_a,"q"),(pygame.K_s,"s"),(pygame.K_d,"d"),(pygame.K_f,"f")]:
-                    if pressed[key]:
-                        rectProp = rect_dict[toinput]
-                        windowSurface.fill(RED, rectProp[0])
-                        soundPlayer.play(rectProp[1], False)
-                        break
-                if pressed[pygame.K_p]:
+                if pressed[pygame.K_w]:
+                    rectProp = self.rect_dict["z"]
+                    self.windowSurface.fill(RED, rectProp[0])
+                    soundPlayer.play(rectProp[1], False)
+                elif pressed[pygame.K_a]:
+                    rectProp = self.rect_dict["q"]
+                    self.windowSurface.fill(RED, rectProp[0])
+                    soundPlayer.play(rectProp[1], False)
+                elif pressed[pygame.K_s]:
+                    rectProp = self.rect_dict["s"]
+                    self.windowSurface.fill(RED, rectProp[0])
+                    soundPlayer.play(rectProp[1], False)
+                elif pressed[pygame.K_d]:
+                    rectProp = self.rect_dict["d"]
+                    self.windowSurface.fill(RED, rectProp[0])
+                    soundPlayer.play(rectProp[1], False)
+                elif pressed[pygame.K_f]:
+                    rectProp = self.rect_dict["f"]
+                    self.windowSurface.fill(RED, rectProp[0])
+                    soundPlayer.play(rectProp[1], False)
+                elif pressed[pygame.K_g]:
+                    rectProp = self.rect_dict["g"]
+                    self.windowSurface.fill(RED, rectProp[0])
+                    soundPlayer.play(rectProp[1], False)
+                elif pressed[pygame.K_UP]:
+                    rectProp = self.rect_dict["U"]
+                    self.windowSurface.fill(RED, rectProp[0])
+                    soundPlayer.play(rectProp[1], False)
+                elif pressed[pygame.K_DOWN]:
+                    rectProp = self.rect_dict["D"]
+                    self.windowSurface.fill(RED, rectProp[0])
+                    soundPlayer.play(rectProp[1], False)
+                elif pressed[pygame.K_p]:
                     self.stop()
 
                 pygame.display.update()
 
 if __name__ == '__main__':
-    cozmo_thread = cute_cozmo.Cozmo_thread()
-    cozmo_thread.daemon = True
-    cozmo_thread.start()
+    #cozmo_thread = cute_cozmo.Cozmo_thread()
+    #cozmo_thread.daemon = True
+    #cozmo_thread.start()
 
-    ka = KeyboardApp(cozmo_thread)
+    ka = KeyboardApp(None)
     ka.run()
