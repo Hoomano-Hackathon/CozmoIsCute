@@ -3,8 +3,10 @@ import time
 import asyncio
 
 from enum import Enum
-
 from cozmo.util import degrees, distance_mm, Angle
+
+from sound_player import Sound
+import pygame
 
 '''
 Goes in the trigonometric way
@@ -20,9 +22,12 @@ class CuteCozmo:
     def __init__(self, robot: cozmo.robot.Robot):
         self.robot = robot
         self.facing = 1
+        self.notes = [20,22,24]
     
     def setup(self):
-        angles = [-1,2,-1]
+        self.robot.world.connect_to_cubes()
+        self.robot.set_head_angle(Angle(0)).wait_for_completed()
+
         colors = [cozmo.lights.red_light, cozmo.lights.green_light, cozmo.lights.blue_light]
         self.cubes = list()
         for i in range(3):
@@ -32,13 +37,22 @@ class CuteCozmo:
                 cube = self.robot.world.wait_for_observed_light_cube(1)
             except:
                 # self.robot.play_anim_trigger(cozmo.anim.Triggers.CubePounceLoseSession).wait_for_completed()
-                print('no cube detected')
+                print('no cube detected :(')
+                self.face(1)
                 return
             self.cubes.append(cube)
             cube.set_lights(color)
-            #self.robot.turn_in_place(Angle(a)).wait_for_completed()
-        
+            self.play(i)
+
         self.face(1)
+
+    def play(self, toPlay):
+        if type(toPlay) == int:
+            # self.face(toPlay) # too slow !
+            sound.play(self.notes[toPlay])
+        elif type(toPlay) == list:
+            for note in toPlay:
+                self.play(note)
     
     def face(self, i):
         self.robot.turn_in_place(Angle(self.facing - i)).wait_for_completed()
@@ -71,5 +85,13 @@ class CuteCozmo:
 def cozmo_program(robot: cozmo.robot.Robot):
     cute = CuteCozmo(robot)
     cute.setup()
+    cute.play([0,0,0,1,2,1,0,2,1,1,0])
 
+def setup_pygame():
+    pygame.init()
+    windowSurface = pygame.display.set_mode((500, 400), 0, 32)
+    pygame.display.update()
+
+sound = Sound()
+setup_pygame()
 cozmo.run_program(cozmo_program)
