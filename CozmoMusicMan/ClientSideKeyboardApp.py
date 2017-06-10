@@ -80,9 +80,9 @@ class KeyboardApp ():
                 pygame.display.update()
 
 if __name__ == '__main__':
-    #cozmo_thread = cute_cozmo.Cozmo_thread()
-    #cozmo_thread.daemon = True
-    #cozmo_thread.start()
+    cozmo_thread = cute_cozmo.Cozmo_thread()
+    cozmo_thread.daemon = True
+    cozmo_thread.start()
 
     ka = KeyboardApp(None)
     ka.run()

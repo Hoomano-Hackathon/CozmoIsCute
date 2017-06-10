@@ -23,12 +23,20 @@ class CuteCozmo:
         self.robot = robot
         self.sound = Sound()
         self.facing = 1
-        self.notes = [20,22,24]
-        self.colors = [
-            cozmo.lights.red_light,
-            cozmo.lights.green_light,
-            cozmo.lights.blue_light
+        self.notes = range(8) # [20,22,24,26,28,30,32]
+        self.color = [
+            (255,0,0),
+            (0,255,0),
+            (0,0,255),
+            (255,255,0),
+            (255,0,255),
+            (0,255,255),
+            (255,255,255),
+            (255,0,0)
         ]
+        self.lights = []
+        for c in self.color:
+            self.lights.append(cozmo.lights.Light(cozmo.lights.Color(rgb=c)))
     
     def setup(self):
         # reconnect to the cubes in case we lost them
@@ -37,10 +45,11 @@ class CuteCozmo:
         self.robot.set_head_angle(Angle(0)).wait_for_completed()
 
         # we face each direction (center, left and right) hoping to find a cube
+        print('Finding cubes')
         self.cubes = list()
         for i in range(3):
             self.face(i)
-            color = self.colors[i]
+            color = self.lights[i]
             try:
                 cube = self.robot.world.wait_for_observed_light_cube(1)
             except:
@@ -68,9 +77,26 @@ class CuteCozmo:
     def armsDown(self, speed=5):
         self.robot.set_lift_height(0).wait_for_completed()
 
+    def switch_off_cubes(self):
+        for c in self.cubes:
+            c.set_lights(cozmo.lights.off_light)
+
     # light a certain cube with the correct color
-    def light_cube(self, cube_index):
-        self.cubes[cube_index].set_lights(self.colors[cube_index])
+    def light_led(self, led_index):
+        nb_notes = len(self.notes)
+        if len(self.notes) == 3:
+            self.cubes[led_index].set_lights(self.lights[led_index])
+        else:
+            cube_index = 0
+            if nb_notes % 3 == 1:
+                if led_index+1 < nb_notes / 3:
+                    cube_index = 0
+                elif led_index <= nb_notes*2/3:
+                    cube_index = 1
+                else:
+                    cube_index = 2
+            light = self.lights[led_index]
+            self.cubes[cube_index].set_lights(light)
 
     # play a note, or a series of notes
     def play(self, toPlay, incremental=False):
@@ -83,10 +109,13 @@ class CuteCozmo:
             self.notePlaying = noteToPlay
             while True: # hold on to your butts, we're gonna do a "do ... while" in python !
                 action = self.hit()
-                self.light_cube(toPlay)
+                self.switch_off_cubes()
+                self.light_led(toPlay)
+                print('note :', toPlay)
                 self.sound.play(noteToPlay, False)
                 action.wait_for_completed()
-                self.cubes[toPlay].set_lights(cozmo.lights.off_light)
+                #self.cubes[toPlay].set_lights(cozmo.lights.off_light)
+                self.light_led(toPlay)
                 if not incremental or self.wait_for_note(noteToPlay):
                     break
         elif type(toPlay) == list:
@@ -122,9 +151,12 @@ class CuteCozmo:
 def cozmo_program(robot: cozmo.robot.Robot):
     cute = CuteCozmo(robot)
     cute.setup()
-    #cute.hit()
     cute.hit().wait_for_completed()
-    cute.play([0,0,0,1,2,-1,1,0,2,1,1,0])
+    #cute.play([0,0,0,1,2,-1,1,0,2,1,1,0])
+    for i in range(len(cute.notes)):
+        cute.play(i)
+    for i in range(len(cute.notes)):
+        cute.play(len(cute.notes)-1-i)
 
 def setup_pygame():
     pygame.init()
