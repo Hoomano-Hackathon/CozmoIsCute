@@ -6,14 +6,14 @@ from sound_player import Sound
 
 class _CuteCozmoSing:
     color_rgb = [
-        (255, 0, 0),
-        (0, 255, 0),
-        (0, 0, 255),
-        (255, 255, 0),
-        (255, 0, 255),
-        (0, 255, 255),
-        (255, 255, 255),
-        (255, 0, 0)
+        (255, 0, 0),  # red
+        (0, 255, 0),  # green
+        (0, 0, 255),  # blue
+        (255, 255, 0),  # yellow
+        (255, 0, 213),  # pink
+        (255, 179, 0),  # orange
+        (204, 0, 204),  # purple
+        (255, 0, 0)  # red
     ]
 
     def __init__(self, robot: cozmo.robot.Robot):
@@ -73,7 +73,6 @@ class _CuteCozmoSing:
     # light a certain cube with the correct color
     def light_cube(self, cube_index):
         self.cubes[cube_index].set_lights(self.lights[cube_index])
-
 
 
     # make Cozmo face a certain direction
@@ -161,4 +160,10 @@ class CozmoSingleton:
     def lift_a_cube(self):
         CozmoSingleton.singleton.lift_a_cube()
 
-
+    def face_cube(self, i, wait=True):
+        angle = (self.facing - i) * 0.5
+        action = self.robot.turn_in_place(Angle((self.facing - i)*0.5))
+        if wait:
+            action.wait_for_completed()
+        self.facing = i
+        return action

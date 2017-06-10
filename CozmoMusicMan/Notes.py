@@ -41,3 +41,9 @@ class Notes(CozmoSingleton):
             return 1
         if mod == 5 or mod == 6 or mod == 7:
             return 2
+
+    # make Cozmo face a certain direction
+    def face_note(self, i, wait=True):
+        cubeToFace = self.get_cube_number(i)
+        print('note', i, '-> cube', cubeToFace)
+        return self.face_cube(cubeToFace, wait)
