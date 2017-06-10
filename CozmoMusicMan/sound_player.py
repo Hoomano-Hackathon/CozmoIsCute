@@ -18,7 +18,7 @@ class Sound:
             self.s.append(pygame.mixer.Sound(os.path.join(dir_path, "Sound", filename)))
         # print(self.s)
 
-    def play(self, id, wait=True):
+    def play(self, id, wait=False):
         self.s[id].play()
         if wait:
             time.sleep(1)

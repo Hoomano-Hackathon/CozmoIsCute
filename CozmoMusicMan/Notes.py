@@ -13,18 +13,23 @@ class Notes(CozmoSingleton):
 
     def play_complete_note(self, note: int):
         # On verifie que le parametre est correct
+        action = self.hit()
         if note < 0 or note > 7:
             time.sleep(1)
             return
         # Recuperation du cube et de la couleur correspondant a la note
         cube_number = self.get_cube_number(note)
-        print(cube_number)
+        # print(cube_number)
         cube = self.cubes[cube_number]
         color = self.lights[note]
         # colorie le cube, joue le son, et fait un tap au Cozmo
         cube.set_lights(color)
+        self.robot.set_all_backpack_lights(color)
         self.sound.play(note)
+        action.wait_for_completed()
+        
         cube.set_lights(cozmo.lights.off_light)
+        self.robot.set_all_backpack_lights(cozmo.lights.off_light)
 
     def get_cube_number(self, note: int):
         if self.simple_mode:

@@ -29,9 +29,11 @@ class CuteCozmo(CozmoSingleton):
 
     def play_note(self, note: int):
         if self.notes is not None:
-            action = self.hit()
+            
+            # action = self.hit()
             self.notes.play_complete_note(note)
-            action.wait_for_completed()
+            # action.wait_for_completed()
+            # cube.set_lights(cozmo.lights.off_light)
         else:
             print('no notes in instance !')
 
@@ -92,7 +94,6 @@ class CuteCozmo(CozmoSingleton):
 
 def cozmo_program(robot: cozmo.robot.Robot):
     cute = CuteCozmo(robot)
-    cute.hit().wait_for_completed()
     cute.play_partition([0, 1, 2, 3, 4, 5, 6, 7])
     # cute.play_partition([0, 0, 0, 1, 2, -1, 1, 0, 2, 1, 1, 0])
 

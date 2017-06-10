@@ -31,6 +31,7 @@ class _CuteCozmoSing:
         return lights
 
     def setup(self):
+        self.armsDown()
         # reconnect to the cubes in case we lost them
         self.robot.world.connect_to_cubes()
         # make the head horizontal
@@ -59,9 +60,9 @@ class _CuteCozmoSing:
 
     # quickly shove the lift down
     def hit(self):
-        print('hitting')
+        #print('hitting')
         self.robot.set_lift_height(1, 500, 20).wait_for_completed()
-        return self.robot.set_lift_height(0, 500, 20)
+        return self.robot.set_lift_height(.5, 500, 20)
 
     def armsUp(self, speed=5):
         self.robot.set_lift_height(1).wait_for_completed()
