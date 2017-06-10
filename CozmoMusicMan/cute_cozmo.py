@@ -181,13 +181,6 @@ class CuteCozmo:
 
     def face_cube(self, i, wait=True):
         angle = (self.facing - i) * 0.5
-        # print('turning to', i, '->', angle)
-        speed = 100
-        acc = 1000
-        # if angle > 0:
-        #     self.robot.drive_wheels(-speed,speed, acc, acc, duration=abs(angle))
-        # elif angle < 0:
-        #     self.robot.drive_wheels(speed,-speed, acc, acc, duration=abs(angle))
         action = self.robot.turn_in_place(Angle((self.facing - i)*0.5))
         if wait:
             action.wait_for_completed()
@@ -219,7 +212,12 @@ class CuteCozmo:
 
 def cozmo_program(robot: cozmo.robot.Robot):
     cute = CuteCozmo(robot)
-    cute.setup()
+    # cute.setup()
+    # KnockOverEyes : when user is playing music
+    # MajorWin : vas-y, joue !
+    # MemoryMatchPlayerLoseHandSolo : quand user se plante
+    #cute.robot.play_anim_trigger(cozmo.anim.Triggers.MemoryMatchPlayerWinHandSolo).wait_for_completed()
+    cute.robot.play_anim_trigger(cozmo.anim.Triggers.OnSpeedtapGameCozmoWinLowIntensity ).wait_for_completed()
     # cute.play(0)
     # if cute.wait_for_note(0):
     #     cute.robot.say_text('bravo').wait_for_completed()
