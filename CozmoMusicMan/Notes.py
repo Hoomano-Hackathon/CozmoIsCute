@@ -24,7 +24,6 @@ class Notes(CozmoSingleton):
         # colorie le cube, joue le son, et fait un tap au Cozmo
         cube.set_lights(color)
         self.sound.play(note)
-        time.sleep(0.5)
         cube.set_lights(cozmo.lights.off_light)
 
     def get_cube_number(self, note: int):
