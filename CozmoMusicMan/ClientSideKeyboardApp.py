@@ -38,7 +38,7 @@ class KeyboardApp ():
         # draw the white background onto the surface
         self.windowSurface.fill(WHITE)
 
-        self.key_codes = [119, 97, 115, 100, 102, 103, 273, 274, 112]
+        self.key_codes = [122, 113, 115, 100, 102, 103, 273, 274, 112]
 
         # draw the "keys" on the canvas
         for num in range(0,8):
