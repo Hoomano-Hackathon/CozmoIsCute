@@ -44,9 +44,6 @@ class Partition:
                 part.append(Note(t[0], t[1]))
         return part
 
-
-
-
 tab = Partition.partitionning(Partition, [[0, 1],
                                [0, 1],
                                [0, 1],
@@ -59,5 +56,5 @@ tab = Partition.partitionning(Partition, [[0, 1],
                                [1, 1],
                                [0, 1]])
 
-p = Partition(90, notes=tab)
+p = Partition(80, notes=tab)
 p.play_part()

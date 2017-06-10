@@ -24,11 +24,13 @@ class _CuteCozmoSing:
         self.cubes = None
         self.say_hello()
         self.setup()
-    
+
+    @staticmethod
     def say_hello(self):
         # TODO
         print('I say hello here')
 
+    @staticmethod
     def setup_color(self):
         lights = []
         for t in _CuteCozmoSing.color_rgb:
@@ -69,9 +71,11 @@ class _CuteCozmoSing:
         self.robot.set_lift_height(1, 500, 20).wait_for_completed()
         return self.robot.set_lift_height(0, 500, 20)
 
+    @staticmethod
     def armsUp(self, speed=5):
         self.robot.set_lift_height(1).wait_for_completed()
 
+    @staticmethod
     def armsDown(self, speed=5):
         self.robot.set_lift_height(0).wait_for_completed()
 
@@ -85,6 +89,7 @@ class _CuteCozmoSing:
         self.robot.turn_in_place(Angle((self.facing - i)*0.5)).wait_for_completed()
         self.facing = i
 
+    @staticmethod
     def wait_for_note(self, note, timeout=5):
         global q
         #empty the queue
@@ -125,6 +130,38 @@ class _CuteCozmoSing:
         #self.robot.go_to_object(cube, distance_mm(70.0)).wait_for_completed()
         self.robot.pickup_object(cube).wait_for_completed()
 
+    async def double_tap(self):
+        """
+        cube = None
+        look_around = self.robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+
+        try:
+            cube = await self.robot.world.wait_for_observed_light_cube(timeout=60)
+        except asyncio.TimeoutError:
+            print("Didn't find a cube :-(")
+            return
+        finally:
+            look_around.stop()
+
+        cube.start_light_chaser()
+        """
+        cube = self.cubes[1]
+        cube.start_light_chaser()
+        self.robot.world.enable_block_tap_filter(False)
+        start_learning = False
+        try:
+            print("Waiting for cube to be tapped")
+            for i in range(2):
+                await cube.wait_for_tap(timeout=60)
+                print("Cube tapped", i)
+            start_learning = True
+
+        except asyncio.TimeoutError:
+            print("No-one tapped our cube :-(")
+        finally:
+            cube.stop_light_chaser()
+            cube.set_lights_off()
+        return start_learning
 
 class CozmoSingleton:
     singleton = None
@@ -138,30 +175,38 @@ class CozmoSingleton:
         self.lights = CozmoSingleton.singleton.lights
         self.cubes = CozmoSingleton.singleton.cubes
 
+    @staticmethod
     def setup_color(self):
         return CozmoSingleton.singleton.setup_color()
 
+    @staticmethod
     def setup(self):
         CozmoSingleton.singleton.setup()
 
     # quickly shove the lift down
+    @staticmethod
     def hit(self):
         return CozmoSingleton.singleton.hit()
 
+    @staticmethod
     def armsUp(self, speed=5):
         CozmoSingleton.singleton.armsUp()
 
+    @staticmethod
     def armsDown(self, speed=5):
         CozmoSingleton.singleton.armsDown()
 
     # light a certain cube with the correct color
+    @staticmethod
     def light_cube(self, cube_index):
         CozmoSingleton.singleton.light_cube(cube_index)
 
     # make Cozmo face a certain direction
+    @staticmethod
     def face(self, i):
         CozmoSingleton.singleton.face(i)
 
+    @staticmethod
     def lift_a_cube(self):
         CozmoSingleton.singleton.lift_a_cube()
 
@@ -172,3 +217,7 @@ class CozmoSingleton:
             action.wait_for_completed()
         self.facing = i
         return action
+
+    @staticmethod
+    async def double_tap(self):
+        return CozmoSingleton.singleton.double_tap()
