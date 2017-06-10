@@ -22,7 +22,7 @@ class _CuteCozmoSing:
         self.facing = 1
         self.lights = self.setup_color()
         self.cubes = None
-        self.setup()
+        # self.setup()
 
     def setup_color(self):
         lights = []
@@ -81,7 +81,30 @@ class _CuteCozmoSing:
         self.robot.turn_in_place(Angle((self.facing - i)*0.5)).wait_for_completed()
         self.facing = i
 
+    def wait_for_note(self, note, timeout=5):
+        global q
+        #empty the queue
+        print('before :', q)
+        try:
+            while q.get_nowait() is not None:
+                pass
+        except:
+            pass
+        print('after :', q)
 
+        #pass # TODO STUART
+        # we wait for the correct signal
+        # if the user inputs the wrong note, or if no note is given in $timeout seconds, return False
+        # otherwise, return True
+        print('waiting for note', note)
+            # code to receive note from MainThread
+        #print('pre get')
+        try:
+            playedNote = q.get(timeout=timeout)
+        except:
+            return False
+        #print('post get')
+        return playedNote == note
 
     def lift_a_cube(self):
         look_around = self.robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
