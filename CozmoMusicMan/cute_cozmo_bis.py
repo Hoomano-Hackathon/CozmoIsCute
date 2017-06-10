@@ -31,7 +31,7 @@ class CuteCozmo:
         self.notes = None
         self.cubes = None
         self.setup()
-        self.notes = Notes(self.sound, self.cubes, self.lights)
+        self.notes = Notes(self.sound, self.cubes, self.lights, simple_mode=False)
 
     def setup_color(self):
         lights = []
@@ -123,8 +123,8 @@ class CuteCozmo:
 def cozmo_program(robot: cozmo.robot.Robot):
     cute = CuteCozmo(robot)
     cute.hit().wait_for_completed()
-    # cute.play_partition([0, 0, 0, 1, 2, -1, 1, 0, 2, 1, 1, 0])
-    cute.play_partition([20, 20, 20, 22, 24, -1, 22, 20, 24, 22, 22, 20])
+    cute.play_partition([0, 0, 0, 1, 2, -1, 1, 0, 2, 1, 1, 0])
+    # cute.play_partition([20, 20, 20, 22, 24, -1, 22, 20, 24, 22, 22, 20])
 
 
 def setup_pygame():
