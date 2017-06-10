@@ -19,5 +19,6 @@ class Sound:
         # print(self.s)
 
     def play(self, id, duration):
-        self.s[id].play(maxtime=int(duration*1000), fade_ms=0)
+        print(duration)
+        self.s[id].play(maxtime=int(duration*1000)-150)
         time.sleep(duration)

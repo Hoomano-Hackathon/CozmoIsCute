@@ -34,7 +34,7 @@ class Partition:
 
     def play_part(self):
         for n in self.notes:
-            self.sound.play(n.note, (n.duration * 60) / (2 * self.speed))
+            self.sound.play(n.note, (n.duration * 60) / (self.speed))
 
     @staticmethod
     def partitionning(self, tab_part: [[int]]):
@@ -59,5 +59,5 @@ tab = Partition.partitionning(Partition, [[0, 1],
                                [1, 1],
                                [0, 1]])
 
-p = Partition(60, notes=tab)
+p = Partition(90, notes=tab)
 p.play_part()
