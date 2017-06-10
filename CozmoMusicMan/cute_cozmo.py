@@ -23,7 +23,7 @@ class CuteCozmo:
         self.robot = robot
         self.sound = Sound()
         self.facing = 1
-        self.notes = [20,22,24,26,28,30,32]
+        self.notes = range(8) # [20,22,24,26,28,30,32]
         self.color = [
             (255,0,0),
             (0,255,0),
@@ -111,6 +111,7 @@ class CuteCozmo:
                 action = self.hit()
                 self.switch_off_cubes()
                 self.light_led(toPlay)
+                print('note :', toPlay)
                 self.sound.play(noteToPlay, False)
                 action.wait_for_completed()
                 #self.cubes[toPlay].set_lights(cozmo.lights.off_light)
