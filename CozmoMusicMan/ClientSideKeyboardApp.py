@@ -2,6 +2,7 @@ import pygame, sys, os, time
 from pygame.locals import *
 from sound_player import Sound
 import cute_cozmo
+from queue import Queue
 
 # set up pygame
 pygame.mixer.pre_init()
@@ -16,9 +17,11 @@ BLUE = (0, 0, 255)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 
+playedNote = 0
+
 print(dir_path)
 class KeyboardApp ():
-    def __init__(self, cozmo_thread):
+    def __init__(self, cozmo_thread, queue: Queue):
         self.cozmo = cozmo_thread
         super(KeyboardApp, self).__init__()
         self.running = False
@@ -56,6 +59,7 @@ class KeyboardApp ():
         sys.exit(0)
 
     def run(self):
+        global playedNote
         self.running = True
         soundPlayer = Sound()
 
@@ -72,17 +76,19 @@ class KeyboardApp ():
                     if pressed[key]:
                         self.windowSurface.fill(RED, value[0])
                         soundPlayer.play(value[1], False)
+                        queue.put(key)
 
                     if pressed[pygame.K_p]:
                         self.stop()
 
-
                 pygame.display.update()
 
 if __name__ == '__main__':
-    cozmo_thread = cute_cozmo.Cozmo_thread()
+    queue = Queue()
+
+    cozmo_thread = cute_cozmo.Cozmo_thread(queue)
     cozmo_thread.daemon = True
     cozmo_thread.start()
 
-    ka = KeyboardApp(None)
+    ka = KeyboardApp(cozmo_thread, queue)
     ka.run()

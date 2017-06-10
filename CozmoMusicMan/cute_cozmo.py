@@ -8,6 +8,9 @@ from cozmo.util import degrees, distance_mm, Angle
 from sound_player import Sound
 import pygame
 import threading
+from queue import Queue
+
+q = None
 
 '''
 Goes in the trigonometric way
@@ -19,7 +22,8 @@ class Dir(Enum):
     EAST = 3
 
 class CuteCozmo:
-    def __init__(self, robot: cozmo.robot.Robot):
+    def __init__(self, robot: cozmo.robot.Robot, q: Queue):
+        self.q = q
         self.robot = robot
         self.sound = Sound()
         self.facing = 1
@@ -123,10 +127,20 @@ class CuteCozmo:
                 self.play(note)
     
     def wait_for_note(self, note, timeout=5):
-        pass # TODO STUART
+        global q
+        #pass # TODO STUART
         # we wait for the correct signal
         # if the user inputs the wrong note, or if no note is given in $timeout seconds, return False
         # otherwise, return True
+        for tick in range(0, timeout):
+            # code to receive note from MainThread
+            playedNote = q.get()
+            if(playedNote == note):
+                return True
+            time.sleep(1)
+
+        return False
+
 
     # make Cozmo face a certain direction
     def face(self, i):
@@ -148,6 +162,7 @@ class CuteCozmo:
         #self.robot.go_to_object(cube, distance_mm(70.0)).wait_for_completed()
         self.robot.pickup_object(cube).wait_for_completed()
 
+
 def cozmo_program(robot: cozmo.robot.Robot):
     cute = CuteCozmo(robot)
     cute.setup()
@@ -164,5 +179,10 @@ def setup_pygame():
     pygame.display.update()
 
 class Cozmo_thread(threading.Thread):
+    def __init__(self, q1: Queue):
+        global q
+        q = q1
+
     def run(self):
         cozmo.run_program(cozmo_program)
+
