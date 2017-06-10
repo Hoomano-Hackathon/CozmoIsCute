@@ -3,7 +3,7 @@ import sys
 import os
 from queue import Queue
 from sound_player import Sound
-from CuteCozmoSup import Cozmo_thread
+from cute_cozmo import Cozmo_thread
 
 # set up pygame
 pygame.mixer.pre_init()
