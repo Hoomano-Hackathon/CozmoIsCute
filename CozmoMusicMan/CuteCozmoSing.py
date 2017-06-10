@@ -22,7 +22,7 @@ class _CuteCozmoSing:
         self.facing = 1
         self.lights = self.setup_color()
         self.cubes = None
-        # self.setup()
+        self.setup()
 
     def setup_color(self):
         lights = []
