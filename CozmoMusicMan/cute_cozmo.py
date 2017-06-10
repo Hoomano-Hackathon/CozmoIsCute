@@ -54,22 +54,30 @@ class CuteCozmo:
         for cube in self.cubes:
             cube.set_lights(cozmo.lights.off_light)
 
-    def lightCube(self, cubeIndex):
-        self.cubes[cubeIndex].set_lights(self.colors[cubeIndex])
+    def light_cube(self, cube_index):
+        self.cubes[cube_index].set_lights(self.colors[cube_index])
 
     def play(self, toPlay, incremental=False):
         if type(toPlay) == int:
-            
-            self.lightCube(toPlay)
+            noteToPlay = None
             if toPlay >= 0 and toPlay < len(self.notes):
-                sound.play(self.notes[toPlay])
+                noteToPlay = self.notes[toPlay]
             else:
-                sound.play(-1)
-            self.cubes[toPlay].set_lights(cozmo.lights.off_light)
+                noteToPlay = -1
+            self.notePlaying = noteToPlay
+            while True: # hold on to your butts, we're gonna do a "do ... while" in python !
+                self.light_cube(toPlay)
+                sound.play(noteToPlay)
+                self.cubes[toPlay].set_lights(cozmo.lights.off_light)
+                if not incremental or self.wait_for_note(noteToPlay):
+                    break
         elif type(toPlay) == list:
             for note in toPlay:
                 self.play(note)
     
+    def wait_for_note(self, note):
+        pass # TODO STUART
+
     def face(self, i):
         self.robot.turn_in_place(Angle(self.facing - i)).wait_for_completed()
         self.facing = i
