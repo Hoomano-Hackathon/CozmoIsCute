@@ -1,7 +1,9 @@
-import pygame, sys, os, time
-from pygame.locals import *
+import pygame
+import sys
+import os
+from queue import Queue
 from sound_player import Sound
-from cute_cozmo_bis import Cozmo_thread
+from CuteCozmoSup import Cozmo_thread
 
 # set up pygame
 pygame.mixer.pre_init()
@@ -87,8 +89,8 @@ class KeyboardApp ():
 
 if __name__ == '__main__':
     queue = Queue()
-
-    cozmo_thread = cute_cozmo.Cozmo_thread(queue)
+    # cute_cozmo.
+    cozmo_thread = Cozmo_thread(queue)
     cozmo_thread.daemon = True
     cozmo_thread.start()
 

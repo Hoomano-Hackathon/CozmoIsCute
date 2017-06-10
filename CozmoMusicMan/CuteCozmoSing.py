@@ -1,41 +1,32 @@
 import cozmo
-import asyncio
 from cozmo.util import Angle
-
+import asyncio
 from sound_player import Sound
-import pygame
-import threading
-from Notes import Notes
-from queue import Queue
 
 
-class CuteCozmo:
-
+class _CuteCozmoSing:
     color_rgb = [
-           (255, 0, 0),
-           (0, 255, 0),
-           (0, 0, 255),
-           (255, 255, 0),
-           (255, 0, 255),
-           (0, 255, 255),
-           (255, 255, 255),
-           (255, 0, 0)
-       ]
+        (255, 0, 0),
+        (0, 255, 0),
+        (0, 0, 255),
+        (255, 255, 0),
+        (255, 0, 255),
+        (0, 255, 255),
+        (255, 255, 255),
+        (255, 0, 0)
+    ]
 
     def __init__(self, robot: cozmo.robot.Robot):
         self.robot = robot
         self.sound = Sound()
         self.facing = 1
-        # self.notes = [20, 22, 24]
         self.lights = self.setup_color()
-        self.notes = None
         self.cubes = None
         self.setup()
-        self.notes = Notes(self.sound, self.cubes, self.lights, simple_mode=False)
 
     def setup_color(self):
         lights = []
-        for t in CuteCozmo.color_rgb:
+        for t in _CuteCozmoSing.color_rgb:
             lights.append(cozmo.lights.Light(cozmo.lights.Color(rgb=t)))
         return lights
 
@@ -68,6 +59,7 @@ class CuteCozmo:
 
     # quickly shove the lift down
     def hit(self):
+        print('hitting')
         self.robot.set_lift_height(1, 500, 20).wait_for_completed()
         return self.robot.set_lift_height(0, 500, 20)
 
@@ -80,24 +72,6 @@ class CuteCozmo:
     # light a certain cube with the correct color
     def light_cube(self, cube_index):
         self.cubes[cube_index].set_lights(self.lights[cube_index])
-
-    def play_partition(self, partition: [int]):
-        for note in partition:
-            self.play_note(note)
-
-    def play_note(self, note: int):
-        if self.notes is not None:
-            action = self.hit()
-            self.notes.play_complete_note(note)
-            action.wait_for_completed()
-        else:
-            print('no notes in instance !')
-
-    def wait_for_note(self, note, timeout=5):
-        pass  # TODO STUART
-        # we wait for the correct signal
-        # if the user inputs the wrong note, or if no note is given in $timeout seconds, return False
-        # otherwise, return True
 
     # make Cozmo face a certain direction
     def face(self, i):
@@ -120,25 +94,43 @@ class CuteCozmo:
         self.robot.pickup_object(cube).wait_for_completed()
 
 
-def cozmo_program(robot: cozmo.robot.Robot):
-    cute = CuteCozmo(robot)
-    cute.hit().wait_for_completed()
-    cute.play_partition([0, 0, 0, 1, 2, -1, 1, 0, 2, 1, 1, 0])
-    # cute.play_partition([20, 20, 20, 22, 24, -1, 22, 20, 24, 22, 22, 20])
+class CozmoSingleton:
+    singleton = None
+
+    def __init__(self, robot: cozmo.robot.Robot):
+        if not CozmoSingleton.singleton:
+            CozmoSingleton.singleton = _CuteCozmoSing(robot)
+        self.robot = CozmoSingleton.singleton
+        self.sound = CozmoSingleton.singleton.sound
+        self.facing = CozmoSingleton.singleton.facing
+        self.lights = CozmoSingleton.singleton.lights
+        self.cubes = CozmoSingleton.singleton.cubes
+
+    def setup_color(self):
+        return CozmoSingleton.singleton.setup_color()
+
+    def setup(self):
+        CozmoSingleton.singleton.setup()
+
+    # quickly shove the lift down
+    def hit(self):
+        return CozmoSingleton.singleton.hit()
+
+    def armsUp(self, speed=5):
+        CozmoSingleton.singleton.armsUp()
+
+    def armsDown(self, speed=5):
+        CozmoSingleton.singleton.armsDown()
+
+    # light a certain cube with the correct color
+    def light_cube(self, cube_index):
+        CozmoSingleton.singleton.light_cube(cube_index)
+
+    # make Cozmo face a certain direction
+    def face(self, i):
+        CozmoSingleton.singleton.face(i)
+
+    def lift_a_cube(self):
+        CozmoSingleton.singleton.lift_a_cube()
 
 
-def setup_pygame():
-    pygame.init()
-    windowSurface = pygame.display.set_mode((500, 400), 0, 32)
-    pygame.display.update()
-
-
-class Cozmo_thread(threading.Thread):
-
-    def __init__(self, q1: Queue):
-        super().__init__()
-        global q
-        q = q1
-
-    def run(self):
-        cozmo.run_program(cozmo_program)
