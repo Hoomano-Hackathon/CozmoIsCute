@@ -15,9 +15,8 @@ class Sound:
         for i in range(1,NB_MUSICS+1):
             self.s.append(pygame.mixer.Sound(os.path.join(dir_path, 'Sound', str(i) + '.wav')))
 
-    def play(self, id, wait=False):
-        if id < 0 or id >= NB_MUSICS:
-            return
-        self.s[id].play()
+    def play(self, id, wait=True):
+        if id >= 0 and id < NB_MUSICS:
+            self.s[id].play()
         if wait:
             time.sleep(1)

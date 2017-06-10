@@ -23,16 +23,21 @@ class CuteCozmo:
         self.robot = robot
         self.facing = 1
         self.notes = [20,22,24]
+        self.colors = [
+            cozmo.lights.red_light,
+            cozmo.lights.green_light,
+            cozmo.lights.blue_light
+        ]
     
     def setup(self):
         self.robot.world.connect_to_cubes()
         self.robot.set_head_angle(Angle(0)).wait_for_completed()
 
-        colors = [cozmo.lights.red_light, cozmo.lights.green_light, cozmo.lights.blue_light]
+        
         self.cubes = list()
         for i in range(3):
             self.face(i)
-            color = colors[i]
+            color = self.colors[i]
             try:
                 cube = self.robot.world.wait_for_observed_light_cube(1)
             except:
@@ -43,13 +48,24 @@ class CuteCozmo:
             self.cubes.append(cube)
             cube.set_lights(color)
             self.play(i)
+            cube.set_lights(color)
 
         self.face(1)
+        for cube in self.cubes:
+            cube.set_lights(cozmo.lights.off_light)
 
-    def play(self, toPlay):
+    def lightCube(self, cubeIndex):
+        self.cubes[cubeIndex].set_lights(self.colors[cubeIndex])
+
+    def play(self, toPlay, incremental=False):
         if type(toPlay) == int:
-            # self.face(toPlay) # too slow !
-            sound.play(self.notes[toPlay])
+            
+            self.lightCube(toPlay)
+            if toPlay >= 0 and toPlay < len(self.notes):
+                sound.play(self.notes[toPlay])
+            else:
+                sound.play(-1)
+            self.cubes[toPlay].set_lights(cozmo.lights.off_light)
         elif type(toPlay) == list:
             for note in toPlay:
                 self.play(note)
@@ -85,7 +101,7 @@ class CuteCozmo:
 def cozmo_program(robot: cozmo.robot.Robot):
     cute = CuteCozmo(robot)
     cute.setup()
-    cute.play([0,0,0,1,2,1,0,2,1,1,0])
+    cute.play([0,0,0,1,2,-1,1,0,2,1,1,0])
 
 def setup_pygame():
     pygame.init()
