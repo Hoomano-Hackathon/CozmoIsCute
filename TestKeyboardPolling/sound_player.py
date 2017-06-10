@@ -3,8 +3,6 @@ import os
 import time
 
 
-NB_MUSICS = 64
-
 class Sound:
 
     def __init__(self):
@@ -12,12 +10,11 @@ class Sound:
         pygame.mixer.pre_init()
         dir_path = os.path.dirname(os.path.realpath(__file__))
         self.s = []
-        for i in range(1,NB_MUSICS+1):
-            self.s.append(pygame.mixer.Sound(os.path.join(dir_path, 'Sound', str(i) + '.wav')))
+        self.s.append(pygame.mixer.Sound(dir_path + "\\Sound\\1.wav"))
+        self.s.append(pygame.mixer.Sound(dir_path + "\\Sound\\2.wav"))
+        self.s.append(pygame.mixer.Sound(dir_path + "\\Sound\\3.wav"))
 
-    def play(self, id, wait=False):
-        if id < 0 or id >= NB_MUSICS:
-            return
+    def play(self, id, wait=True):
         self.s[id].play()
         if wait:
             time.sleep(1)
