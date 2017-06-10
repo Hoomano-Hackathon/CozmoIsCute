@@ -80,13 +80,15 @@ class CuteCozmo(CozmoSingleton):
 
 def cozmo_program(robot: cozmo.robot.Robot):
     cute = CuteCozmo(robot)
+    """
     if cute.wait_for_note(1):
         print('content !')
         cute.robot.play_anim_trigger(cozmo.anim.Triggers.OnSpeedtapGameCozmoWinLowIntensity).wait_for_completed()
     else:
         print('fâché !')
         cute.robot.play_anim_trigger(cozmo.anim.Triggers.MemoryMatchPlayerLoseHandSolo).wait_for_completed()
-    # cute.play_partition([0, 1, 2, 3, 4, 5, 6, 7])
+    """
+    cute.play_partition([0, 1, 2, 3, 4, 5, 6, 7])
     # cute.play_partition([0, 0, 0, 1, 2, -1, 1, 0, 2, 1, 1, 0])
 
 

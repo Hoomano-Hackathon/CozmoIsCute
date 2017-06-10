@@ -22,3 +22,4 @@ class Sound:
         self.s[id].play()
         if wait:
             time.sleep(1)
+
