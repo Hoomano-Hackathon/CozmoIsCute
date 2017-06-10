@@ -30,10 +30,12 @@ class CuteCozmo:
         ]
     
     def setup(self):
+        # reconnect to the cubes in case we lost them
         self.robot.world.connect_to_cubes()
+        # make the head horizontal
         self.robot.set_head_angle(Angle(0)).wait_for_completed()
 
-        
+        # we face each direction (center, left and right) hoping to find a cube
         self.cubes = list()
         for i in range(3):
             self.face(i)
@@ -54,9 +56,11 @@ class CuteCozmo:
         for cube in self.cubes:
             cube.set_lights(cozmo.lights.off_light)
 
+    # light a certain cube with the correct color
     def light_cube(self, cube_index):
         self.cubes[cube_index].set_lights(self.colors[cube_index])
 
+    # play a note, or a series of notes
     def play(self, toPlay, incremental=False):
         if type(toPlay) == int:
             noteToPlay = None
@@ -75,9 +79,13 @@ class CuteCozmo:
             for note in toPlay:
                 self.play(note)
     
-    def wait_for_note(self, note):
+    def wait_for_note(self, note, timeout=5):
         pass # TODO STUART
+        # we wait for the correct signal
+        # if the user inputs the wrong note, or if no note is given in $timeout seconds, return False
+        # otherwise, return True
 
+    # make Cozmo face a certain direction
     def face(self, i):
         self.robot.turn_in_place(Angle(self.facing - i)).wait_for_completed()
         self.facing = i
@@ -97,6 +105,7 @@ class CuteCozmo:
         #self.robot.go_to_object(cube, distance_mm(70.0)).wait_for_completed()
         self.robot.pickup_object(cube).wait_for_completed()
 
+    # quickly shove the lift down
     def hit(self):
         self.robot.set_lift_height(0,duration=0.15).wait_for_completed()
 
