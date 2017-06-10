@@ -1,7 +1,7 @@
 import pygame, sys, os, time
 from pygame.locals import *
 from sound_player import Sound
-import cute_cozmo
+from cute_cozmo_bis import Cozmo_thread
 
 # set up pygame
 pygame.mixer.pre_init()
@@ -106,7 +106,7 @@ class KeyboardApp ():
                 pygame.display.update()
 
 if __name__ == '__main__':
-    cozmo_thread = cute_cozmo.Cozmo_thread()
+    cozmo_thread = Cozmo_thread()
     cozmo_thread.daemon = True
     cozmo_thread.start()
 

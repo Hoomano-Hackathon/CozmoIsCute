@@ -92,3 +92,4 @@ ENV/
 .ropeproject
 
 .iml
+Supprimerait .idea/

@@ -1,28 +1,43 @@
 import cozmo
 import time
 import asyncio
-
-from enum import Enum
 from cozmo.util import degrees, distance_mm, Angle
 
 from sound_player import Sound
 import pygame
 import threading
-
-
+from Notes import Notes
 
 
 class CuteCozmo:
+
+    color_rgb = [
+           (255, 0, 0),
+           (0, 255, 0),
+           (0, 0, 255),
+           (255, 255, 0),
+           (255, 0, 255),
+           (0, 255, 255),
+           (255, 255, 255),
+           (255, 0, 0)
+       ]
+
     def __init__(self, robot: cozmo.robot.Robot):
         self.robot = robot
         self.sound = Sound()
         self.facing = 1
-        self.notes = [20, 22, 24]
-        self.colors = [
-            cozmo.lights.red_light,
-            cozmo.lights.green_light,
-            cozmo.lights.blue_light
-        ]
+        # self.notes = [20, 22, 24]
+        self.lights = self.setup_color()
+        self.notes = None
+        self.cubes = None
+        self.setup()
+        self.notes = Notes(self.sound, self.cubes, self.lights)
+
+    def setup_color(self):
+        lights = []
+        for t in CuteCozmo.color_rgb:
+            lights.append(cozmo.lights.Light(cozmo.lights.Color(rgb=t)))
+        return lights
 
     def setup(self):
         # reconnect to the cubes in case we lost them
@@ -34,7 +49,7 @@ class CuteCozmo:
         self.cubes = list()
         for i in range(3):
             self.face(i)
-            color = self.colors[i]
+            color = self.lights[i]
             try:
                 cube = self.robot.world.wait_for_observed_light_cube(1)
             except:
@@ -44,7 +59,7 @@ class CuteCozmo:
                 return
             self.cubes.append(cube)
             cube.set_lights(color)
-            self.play(i)
+            # self.play_note(i)
             cube.set_lights(color)
 
         self.face(1)
@@ -64,31 +79,22 @@ class CuteCozmo:
 
     # light a certain cube with the correct color
     def light_cube(self, cube_index):
-        self.cubes[cube_index].set_lights(self.colors[cube_index])
+        self.cubes[cube_index].set_lights(self.lights[cube_index])
 
-    # play a note, or a series of notes
-    def play(self, toPlay, incremental=False):
-        if type(toPlay) == int:
-            noteToPlay = None
-            if toPlay >= 0 and toPlay < len(self.notes):
-                noteToPlay = self.notes[toPlay]
-            else:
-                noteToPlay = -1
-            self.notePlaying = noteToPlay
-            while True: # hold on to your butts, we're gonna do a "do ... while" in python !
-                action = self.hit()
-                self.light_cube(toPlay)
-                self.sound.play(noteToPlay, False)
-                action.wait_for_completed()
-                self.cubes[toPlay].set_lights(cozmo.lights.off_light)
-                if not incremental or self.wait_for_note(noteToPlay):
-                    break
-        elif type(toPlay) == list:
-            for note in toPlay:
-                self.play(note)
+    def play_partition(self, partition: [int]):
+        for note in partition:
+            self.play_note(note)
+
+    def play_note(self, note: int):
+        if self.notes is not None:
+            action = self.hit()
+            self.notes.play_complete_note(note)
+            action.wait_for_completed()
+        else:
+            print('no notes in instance !')
 
     def wait_for_note(self, note, timeout=5):
-        pass # TODO STUART
+        pass  # TODO STUART
         # we wait for the correct signal
         # if the user inputs the wrong note, or if no note is given in $timeout seconds, return False
         # otherwise, return True
@@ -117,9 +123,8 @@ class CuteCozmo:
 def cozmo_program(robot: cozmo.robot.Robot):
     cute = CuteCozmo(robot)
     cute.hit().wait_for_completed()
-    cute.setup()
-    cute.hit().wait_for_completed()
-    cute.play([0, 0, 0, 1, 2, -1, 1, 0, 2, 1, 1, 0])
+    # cute.play_partition([0, 0, 0, 1, 2, -1, 1, 0, 2, 1, 1, 0])
+    cute.play_partition([20, 20, 20, 22, 24, -1, 22, 20, 24, 22, 22, 20])
 
 
 def setup_pygame():
