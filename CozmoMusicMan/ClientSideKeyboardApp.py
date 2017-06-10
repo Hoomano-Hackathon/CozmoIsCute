@@ -37,12 +37,12 @@ class KeyboardApp ():
         # draw the white background onto the surface
         self.windowSurface.fill(WHITE)
 
-        keyCodes = [119, 97, 115, 100, 102, 103, 273, 274, 112]
+        self.key_codes = [119, 97, 115, 100, 102, 103, 273, 274, 112]
 
         # draw the "keys" on the canvas
         for num in range(0,8):
             rect = pygame.draw.rect(self.windowSurface, BLUE, (20+60*num, 20, 40, 40))
-            self.rect_dict[keyCodes[num]] = [rect, num]
+            self.rect_dict[self.key_codes[num]] = [rect, num]
 
 
         # pygame.draw.rect(windowSurface, BLUE, (rect + 20, rect + 20, 40, 40))
@@ -76,7 +76,10 @@ class KeyboardApp ():
                     if pressed[key]:
                         self.windowSurface.fill(RED, value[0])
                         soundPlayer.play(value[1], False)
-                        queue.put(key)
+                        
+                        #queue.put(key)
+                        print('putting', key, 'in queue')
+                        queue.put(self.key_codes.index(key))
 
                     if pressed[pygame.K_p]:
                         self.stop()

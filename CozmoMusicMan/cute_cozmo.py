@@ -23,8 +23,7 @@ class Dir(Enum):
     EAST = 3
 
 class CuteCozmo:
-    def __init__(self, robot: cozmo.robot.Robot, q: Queue):
-        self.q = q
+    def __init__(self, robot: cozmo.robot.Robot):
         self.robot = robot
         self.sound = Sound()
         self.facing = 1
@@ -147,18 +146,31 @@ class CuteCozmo:
     
     def wait_for_note(self, note, timeout=5):
         global q
+        #empty the queue
+        print('before :', q)
+        try:
+            while q.get_nowait() is not None:
+                pass
+        except:
+            pass
+        print('after :', q)
+
         #pass # TODO STUART
         # we wait for the correct signal
         # if the user inputs the wrong note, or if no note is given in $timeout seconds, return False
         # otherwise, return True
-        for tick in range(0, timeout):
+        print('waiting for note', note)
             # code to receive note from MainThread
-            playedNote = q.get()
-            if(playedNote == note):
-                return True
-            time.sleep(1)
-
-        return False
+        print('pre get')
+        try:
+            playedNote = q.get(timeout=timeout)
+        except:
+            return False
+        print('post get')
+        return playedNote == note
+        # if playedNote == note:
+        #     return True
+        # return False
 
 
     def face_cube(self, i, wait=True):
@@ -202,6 +214,11 @@ class CuteCozmo:
 def cozmo_program(robot: cozmo.robot.Robot):
     cute = CuteCozmo(robot)
     cute.setup()
+    cute.play(0)
+    if cute.wait_for_note(0):
+        cute.robot.say_text('bravo').wait_for_completed()
+    else:
+        cute.robot.say_text('caca').wait_for_completed()
 
 def setup_pygame():
     pygame.init()
@@ -210,6 +227,7 @@ def setup_pygame():
 
 class Cozmo_thread(threading.Thread):
     def __init__(self, q1: Queue):
+        super().__init__()
         global q
         q = q1
 
