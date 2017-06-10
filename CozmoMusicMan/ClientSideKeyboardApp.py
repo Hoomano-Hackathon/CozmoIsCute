@@ -76,31 +76,13 @@ class KeyboardApp ():
             # Check current key presses
             for event in pygame.event.get():
                 pressed = pygame.key.get_pressed()
-                if pressed[pygame.K_w]:
-                    rectProp = self.rect_dict["z"]
-                    self.windowSurface.fill(RED, rectProp[0])
-                    soundPlayer.play(rectProp[1], False)
-                elif pressed[pygame.K_a]:
-                    rectProp = self.rect_dict["q"]
-                    self.windowSurface.fill(RED, rectProp[0])
-                    soundPlayer.play(rectProp[1], False)
-                elif pressed[pygame.K_s]:
-                    rectProp = self.rect_dict["s"]
-                    self.windowSurface.fill(RED, rectProp[0])
-                    soundPlayer.play(rectProp[1], False)
-                elif pressed[pygame.K_d]:
-                    rectProp = self.rect_dict["d"]
-                    self.windowSurface.fill(RED, rectProp[0])
-                    soundPlayer.play(rectProp[1], False)
-                elif pressed[pygame.K_f]:
-                    rectProp = self.rect_dict["f"]
-                    self.windowSurface.fill(RED, rectProp[0])
-                    soundPlayer.play(rectProp[1], False)
-                elif pressed[pygame.K_g]:
-                    rectProp = self.rect_dict["g"]
-                    self.windowSurface.fill(RED, rectProp[0])
-                    soundPlayer.play(rectProp[1], False)
-                elif pressed[pygame.K_p]:
+                for (key,toinput) in [(pygame.K_w,"z"),(pygame.K_a,"q"),(pygame.K_s,"s"),(pygame.K_d,"d"),(pygame.K_f,"f")]:
+                    if pressed[key]:
+                        rectProp = rect_dict[toinput]
+                        windowSurface.fill(RED, rectProp[0])
+                        soundPlayer.play(rectProp[1], False)
+                        break
+                if pressed[pygame.K_p]:
                     self.stop()
 
                 pygame.display.update()
