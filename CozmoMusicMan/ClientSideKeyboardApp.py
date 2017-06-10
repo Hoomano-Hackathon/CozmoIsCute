@@ -34,18 +34,12 @@ class KeyboardApp ():
         # draw the white background onto the surface
         self.windowSurface.fill(WHITE)
 
-        letters = "zqsdfgUD"
+        keyCodes = [119, 97, 115, 100, 102, 103, 273, 274, 112]
 
         # draw the "keys" on the canvas
         for num in range(0,8):
             rect = pygame.draw.rect(self.windowSurface, BLUE, (20+60*num, 20, 40, 40))
-            self.rect_dict[letters[num]] = [rect, num]
-
-        """rect = pygame.draw.rect(windowSurface, BLUE, (80, 20, 40, 40))
-        rect_dict["q"] = [rect, 1]
-
-        rect = pygame.draw.rect(windowSurface, BLUE, (140, 20, 40, 40))
-        rect_dict["s"] = [rect, 2]"""
+            self.rect_dict[keyCodes[num]] = [rect, num]
 
 
         # pygame.draw.rect(windowSurface, BLUE, (rect + 20, rect + 20, 40, 40))
@@ -74,40 +68,14 @@ class KeyboardApp ():
             # Check current key presses
             for event in pygame.event.get():
                 pressed = pygame.key.get_pressed()
-                if pressed[pygame.K_w]:
-                    rectProp = self.rect_dict["z"]
-                    self.windowSurface.fill(RED, rectProp[0])
-                    soundPlayer.play(rectProp[1], False)
-                elif pressed[pygame.K_a]:
-                    rectProp = self.rect_dict["q"]
-                    self.windowSurface.fill(RED, rectProp[0])
-                    soundPlayer.play(rectProp[1], False)
-                elif pressed[pygame.K_s]:
-                    rectProp = self.rect_dict["s"]
-                    self.windowSurface.fill(RED, rectProp[0])
-                    soundPlayer.play(rectProp[1], False)
-                elif pressed[pygame.K_d]:
-                    rectProp = self.rect_dict["d"]
-                    self.windowSurface.fill(RED, rectProp[0])
-                    soundPlayer.play(rectProp[1], False)
-                elif pressed[pygame.K_f]:
-                    rectProp = self.rect_dict["f"]
-                    self.windowSurface.fill(RED, rectProp[0])
-                    soundPlayer.play(rectProp[1], False)
-                elif pressed[pygame.K_g]:
-                    rectProp = self.rect_dict["g"]
-                    self.windowSurface.fill(RED, rectProp[0])
-                    soundPlayer.play(rectProp[1], False)
-                elif pressed[pygame.K_UP]:
-                    rectProp = self.rect_dict["U"]
-                    self.windowSurface.fill(RED, rectProp[0])
-                    soundPlayer.play(rectProp[1], False)
-                elif pressed[pygame.K_DOWN]:
-                    rectProp = self.rect_dict["D"]
-                    self.windowSurface.fill(RED, rectProp[0])
-                    soundPlayer.play(rectProp[1], False)
-                elif pressed[pygame.K_p]:
-                    self.stop()
+                for key, value in self.rect_dict.items():
+                    if pressed[key]:
+                        self.windowSurface.fill(RED, value[0])
+                        soundPlayer.play(value[1], False)
+
+                    if pressed[pygame.K_p]:
+                        self.stop()
+
 
                 pygame.display.update()
 
