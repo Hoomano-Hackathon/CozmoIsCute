@@ -64,31 +64,13 @@ while True:
     # Check current key presses
     for event in pygame.event.get():
         pressed = pygame.key.get_pressed()
-        if pressed[pygame.K_w]:
-            rectProp = rect_dict["z"]
-            windowSurface.fill(RED, rectProp[0])
-            soundPlayer.play(rectProp[1], False)
-        elif pressed[pygame.K_a]:
-            rectProp = rect_dict["q"]
-            windowSurface.fill(RED, rectProp[0])
-            soundPlayer.play(rectProp[1], False)
-        elif pressed[pygame.K_s]:
-            rectProp = rect_dict["s"]
-            windowSurface.fill(RED, rectProp[0])
-            soundPlayer.play(rectProp[1], False)
-        elif pressed[pygame.K_d]:
-            rectProp = rect_dict["d"]
-            windowSurface.fill(RED, rectProp[0])
-            soundPlayer.play(rectProp[1], False)
-        elif pressed[pygame.K_f]:
-            rectProp = rect_dict["f"]
-            windowSurface.fill(RED, rectProp[0])
-            soundPlayer.play(rectProp[1], False)
-        elif pressed[pygame.K_g]:
-            rectProp = rect_dict["g"]
-            windowSurface.fill(RED, rectProp[0])
-            soundPlayer.play(rectProp[1], False)
-        elif pressed[pygame.K_p]:
+        for (key,toinput) in [(pygame.K_w,"z"),(pygame.K_a,"q"),(pygame.K_s,"s"),(pygame.K_d,"d"),(pygame.K_f,"f")]:
+            if pressed[key]:
+                rectProp = rect_dict[toinput]
+                windowSurface.fill(RED, rectProp[0])
+                soundPlayer.play(rectProp[1], False)
+                break
+        if pressed[pygame.K_p]:
             pygame.quit()
             sys.exit()
 
