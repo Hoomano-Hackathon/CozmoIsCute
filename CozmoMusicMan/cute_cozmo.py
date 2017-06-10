@@ -47,13 +47,14 @@ class CuteCozmo:
         self.robot.world.connect_to_cubes()
         # make the head horizontal
         self.robot.set_head_angle(Angle(0)).wait_for_completed()
+        self.armsDown()
 
         # we face each direction (center, left and right) hoping to find a cube
         print('Finding cubes')
         self.cubes = list()
+        current_note = 0
         for i in range(3):
             self.face_cube(i)
-            color = self.lights[i]
             try:
                 cube = self.robot.world.wait_for_observed_light_cube(1)
             except:
@@ -61,11 +62,15 @@ class CuteCozmo:
                 print('no cube detected :(')
                 self.face_cube(1)
                 return
+            
             self.cubes.append(cube)
-            cube.set_lights(color)
-            self.play(i)
-            cube.set_lights(color)
-
+            current_cube_index = i
+            while self.cube_from_note(current_note) is i and current_note < len(self.notes):
+                print('preparing to play', current_note)
+                self.play(current_note)
+                current_note += 1
+            #print(current_cube, 'is not', i)
+                
         self.face_cube(1)
         for cube in self.cubes:
             cube.set_lights(cozmo.lights.off_light)
@@ -115,6 +120,7 @@ class CuteCozmo:
             self.cubes[led_index].set_lights(light)
         else:
             cube_index = self.cube_from_note(led_index)
+            print('cube_index =', cube_index)
             self.cubes[cube_index].set_lights(light)
         self.robot.set_all_backpack_lights(light)
 
@@ -175,7 +181,7 @@ class CuteCozmo:
 
     def face_cube(self, i, wait=True):
         angle = (self.facing - i) * 0.5
-        print('turning to', i, '->', angle)
+        # print('turning to', i, '->', angle)
         speed = 100
         acc = 1000
         # if angle > 0:
@@ -193,7 +199,7 @@ class CuteCozmo:
     def face_note(self, i, wait=True):
         cubeToFace = self.cube_from_note(i)
         print('note',i,'-> cube',cubeToFace)
-        #return self.face_cube(cubeToFace,wait)
+        return self.face_cube(cubeToFace,wait)
 
     def lift_a_cube(self):
         look_around = self.robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
@@ -214,11 +220,11 @@ class CuteCozmo:
 def cozmo_program(robot: cozmo.robot.Robot):
     cute = CuteCozmo(robot)
     cute.setup()
-    cute.play(0)
-    if cute.wait_for_note(0):
-        cute.robot.say_text('bravo').wait_for_completed()
-    else:
-        cute.robot.say_text('caca').wait_for_completed()
+    # cute.play(0)
+    # if cute.wait_for_note(0):
+    #     cute.robot.say_text('bravo').wait_for_completed()
+    # else:
+    #     cute.robot.say_text('caca').wait_for_completed()
 
 def setup_pygame():
     pygame.init()
