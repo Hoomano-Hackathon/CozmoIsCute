@@ -24,7 +24,7 @@ class _CuteCozmoSing:
         self.cubes = None
         self.say_hello()
         self.setup()
-    
+
     def say_hello(self):
         # TODO
         print('I say hello here')
@@ -125,6 +125,41 @@ class _CuteCozmoSing:
         #self.robot.go_to_object(cube, distance_mm(70.0)).wait_for_completed()
         self.robot.pickup_object(cube).wait_for_completed()
 
+    def double_tap(self):
+        """
+        cube = None
+        look_around = self.robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
+
+        try:
+            cube = self.robot.world.wait_for_observed_light_cube(timeout=60)
+        except asyncio.TimeoutError:
+            print("Didn't find a cube :-(")
+            return
+        finally:
+            look_around.stop()
+
+        cube.start_light_chaser()
+        """
+        cube = self.cubes[1]
+        cube.start_light_chaser()
+        self.robot.world.enable_block_tap_filter(False)
+        start_learning = False
+        try:
+            print("Waiting for cube to be tapped")
+            for i in range(2):
+                cube.wait_for_tap(timeout=60)
+                print("Cube tapped", i)
+            start_learning = True
+
+        except asyncio.TimeoutError:
+            print("No-one tapped our cube :-(")
+        finally:
+            cube.stop_light_chaser()
+            cube.set_lights_off()
+        return start_learning
+
+
+
 
 class CozmoSingleton:
     singleton = None
@@ -172,3 +207,6 @@ class CozmoSingleton:
             action.wait_for_completed()
         self.facing = i
         return action
+
+    def double_tap(self):
+        return CozmoSingleton.singleton.double_tap()
