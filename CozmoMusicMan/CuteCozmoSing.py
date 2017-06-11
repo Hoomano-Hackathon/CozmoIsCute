@@ -125,13 +125,13 @@ class _CuteCozmoSing:
         #self.robot.go_to_object(cube, distance_mm(70.0)).wait_for_completed()
         self.robot.pickup_object(cube).wait_for_completed()
 
-    async def double_tap(self):
+    def double_tap(self):
         """
         cube = None
         look_around = self.robot.start_behavior(cozmo.behavior.BehaviorTypes.LookAroundInPlace)
 
         try:
-            cube = await self.robot.world.wait_for_observed_light_cube(timeout=60)
+            cube = self.robot.world.wait_for_observed_light_cube(timeout=60)
         except asyncio.TimeoutError:
             print("Didn't find a cube :-(")
             return
@@ -147,7 +147,7 @@ class _CuteCozmoSing:
         try:
             print("Waiting for cube to be tapped")
             for i in range(2):
-                await cube.wait_for_tap(timeout=60)
+                cube.wait_for_tap(timeout=60)
                 print("Cube tapped", i)
             start_learning = True
 
@@ -157,6 +157,8 @@ class _CuteCozmoSing:
             cube.stop_light_chaser()
             cube.set_lights_off()
         return start_learning
+
+
 
 
 class CozmoSingleton:

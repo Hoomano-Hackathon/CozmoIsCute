@@ -23,9 +23,10 @@ class CuteCozmo(CozmoSingleton):
         CozmoSingleton.__init__(self, robot)
         self.notes = Notes(robot, simple_mode=False)
 
+    # TODO : tester et verifier...
     def wait_and_learn(self):
-        start = self.double_tap()
-        if not start: # voir si le fait que ce soit asynchrone ne pose pas de problème ici !
+        start = self.double_tap()  # on attend que le double tap soit fait (renvoie True ou False si delai trop long)
+        if not start:  # si il n'y a pas eu de double tap -> possibilite de mettre une animation
             return
         global q
         # empty the queue
@@ -37,7 +38,7 @@ class CuteCozmo(CozmoSingleton):
 
         partition = []
         next_note = self.learn_next_note()
-        while next_note >=0:
+        while next_note >= 0:  # tant qu'on a des notes jouees avant 20s d'intervalle
             partition.append(next_note)
         return partition
 
@@ -45,8 +46,8 @@ class CuteCozmo(CozmoSingleton):
 
     def learn_next_note(self):
         try:
-            playedNote = q.get(timeout=20) # on attend 20s max entre deux notes
-        except:
+            playedNote = q.get(timeout=20)  # on attend 20s max entre deux notes
+        except:  # si les 20s sont depassees
             return -1
         return playedNote
 
@@ -117,7 +118,11 @@ class CuteCozmo(CozmoSingleton):
 def cozmo_program(robot: cozmo.robot.Robot):
     # dire_bonjour+s etup
     cute = CuteCozmo(robot)
-    
+
+    # apprentissage d'une partion et rejouer
+    part = cute.wait_and_learn()  # apprend une partition
+    cute.play_partition(part)  # la rejoue
+
     # demo gamme
     for i in range(8):
         cute.play_note(i)
