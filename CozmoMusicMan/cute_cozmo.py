@@ -99,7 +99,7 @@ class CuteCozmo(CozmoSingleton):
             pass
         print('after :', q)
 
-        # pass # TODO STUART
+        
         # we wait for the correct signal
         # if the user inputs the wrong note, or if no note is given in $timeout seconds, return False
         # otherwise, return True
@@ -116,7 +116,7 @@ class CuteCozmo(CozmoSingleton):
         #     return True
         # return False
 
-def mini_jeu_lire_melodie(cute: CuteCozmo):
+def mini_jeu_lire_melodie():
     melodie = list()
     with open('partition.txt') as f:
         reader = csv.reader(f, delimiter=' ')
@@ -132,12 +132,17 @@ def mini_jeu_lire_melodie(cute: CuteCozmo):
 def mini_jeu_jouer_melodie(cute: CuteCozmo, melodie = None, taille_groupe = 4):
     if melodie == None:
         melodie = mini_jeu_lire_melodie()
-    
+    # clear cube hit before
+    for cube in cute.cubes:
+        cube.last_tapped_time = None
+
     robot = cute.robot
     # jouer mélodie si complexe
-    if len(melodie) >= taille_groupe:
-        cute.play_partition(melodie)
-        # TODO animation "ok fin de démo"
+    # if len(melodie) >= taille_groupe: # TODO remettre, c'était pour la démo
+    #     cute.play_partition(melodie)
+        # animation "ok fin de démo"
+        robot.play_anim('anim_meetcozmo_sayname_02').wait_for_completed()
+        cute.face_cube(1)
     user_succeded = False
     while not user_succeded:
         print('start while')
@@ -154,12 +159,19 @@ def mini_jeu_jouer_melodie(cute: CuteCozmo, melodie = None, taille_groupe = 4):
         taille_ensemble = 0
         while taille_ensemble <= len(melodie):
             cute.play_partition(melodie[:taille_ensemble])
-            # TODO animation "à toi"
+
+            robot.play_anim('anim_rtpmemorymatch_request_02').wait_for_completed() # à toi
+            cute.face_cube(1)
+
             if not cute.wait_for_partition(melodie[:taille_ensemble]):
                 print('user planted himself')
+                robot.play_anim('anim_cozmosays_badword_01').wait_for_completed()
+                cute.face_cube(1)
                 break
             elif taille_ensemble == len(melodie):
                 print('user a reussi')
+                robot.play_anim('anim_meetcozmo_sayname_02').wait_for_completed()
+                cute.face_cube(1)
                 user_succeded = True
                 break
             elif len(melodie) - taille_ensemble <= taille_groupe:
@@ -169,8 +181,10 @@ def mini_jeu_jouer_melodie(cute: CuteCozmo, melodie = None, taille_groupe = 4):
 
 def mini_jeu_enregistrer_melodie(cute: CuteCozmo):
     print('saving a melody')
+    
     global q
-
+    cute.robot.play_anim('anim_explorer_huh_01').wait_for_completed() # curious
+    cute.face_cube(1)
     # empty queue
     while not q.empty():
         try:
@@ -178,7 +192,10 @@ def mini_jeu_enregistrer_melodie(cute: CuteCozmo):
         except Empty:
             continue
         q.task_done()
-    
+    # TODO make cubes blink
+    blink_light = cozmo.lights.Light(cozmo.lights.Color(rgb=(255,255,255)), cozmo.lights.off, off_period_ms=250, transition_off_period_ms=50, transition_on_period_ms=50)
+    for cube in cute.cubes:
+        cube.set_lights(blink_light)
     # wait while not tap
     tapped = False
     while not tapped:
@@ -197,36 +214,35 @@ def mini_jeu_enregistrer_melodie(cute: CuteCozmo):
                 break
             f.write(str(note) + ' ')
             q.task_done()
-
-
+    # make cubes switch off
+    for cube in cute.cubes:
+        cube.set_lights(cozmo.lights.off_light)
 
 def cozmo_program(robot: cozmo.robot.Robot):
     # dire_bonjour+setup
+    robot.play_anim('anim_freeplay_reacttoface_like_01').wait_for_completed()
+    
     cute = CuteCozmo(robot)
-    
+    cute.face_cube(1)
     # demo gamme
-    # for i in range(8):
-    #     cute.play_note(i)
+    for i in range(8):
+        cute.play_note(i)
     
-    # TODO Animation content, je t'invite a continuer
+    # Animation content, je t'invite a continuer
+    robot.play_anim('anim_fistbump_success_01').wait_for_completed()
+    cute.face_cube(1)
     #Partie jouer mélodie simple
     melodie = [1,4,7]
-    #clair_de_lune = [0,0,0,1,2,1,0,2,1,1,0] # points bonus si tu devines la mélodie à partir des ints
     print('playing simple melody')
     mini_jeu_jouer_melodie(cute, melodie)
     mini_jeu_enregistrer_melodie(cute)
+    robot.play_anim('anim_hiking_observe_01').wait_for_completed()
+    mini_jeu_jouer_melodie(cute)
 
-    cute.play_partition(mini_jeu_lire_melodie(cute))
-    #mini_jeu_jouer_melodie(cute)
-            
-    # if cute.wait_for_note(1):
-    #     print('content !')
-    #     cute.robot.play_anim_trigger(cozmo.anim.Triggers.OnSpeedtapGameCozmoWinLowIntensity).wait_for_completed()
-    # else:
-    #     print('fâché !')
-    #     cute.robot.play_anim_trigger(cozmo.anim.Triggers.MemoryMatchPlayerLoseHandSolo).wait_for_completed()
-    # cute.play_partition([0, 1, 2, 3, 4, 5, 6, 7])
-    # cute.play_partition([0, 0, 0, 1, 2, -1, 1, 0, 2, 1, 1, 0])
+    robot.play_anim('anim_freeplay_reacttoface_like_01').wait_for_completed()
+    robot.turn_in_place(Angle(degrees=180)).wait_for_completed()
+    robot.drive_wheels(500, 500)
+    time.sleep(5)
 
 
 def setup_pygame():
