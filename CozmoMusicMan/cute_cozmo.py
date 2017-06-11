@@ -23,6 +23,33 @@ class CuteCozmo(CozmoSingleton):
         CozmoSingleton.__init__(self, robot)
         self.notes = Notes(robot, simple_mode=False)
 
+    def wait_and_learn(self):
+        start = self.double_tap()
+        if not start: # voir si le fait que ce soit asynchrone ne pose pas de problème ici !
+            return
+        global q
+        # empty the queue
+        try:
+            while q.get_nowait() is not None:
+                pass
+        except:
+            pass
+
+        partition = []
+        next_note = self.learn_next_note()
+        while next_note >=0:
+            partition.append(next_note)
+        return partition
+
+
+
+    def learn_next_note(self):
+        try:
+            playedNote = q.get(timeout=20) # on attend 20s max entre deux notes
+        except:
+            return -1
+        return playedNote
+
     def play_partition(self, partition: [int]):
         for note in partition:
             self.play_note(note)
