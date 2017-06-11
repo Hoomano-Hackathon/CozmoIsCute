@@ -1,4 +1,4 @@
-from CozmoMusicMan.model.sound_player import Sound
+from ..sound_player import Sound
 
 class Note:
 

@@ -67,7 +67,7 @@ class _CuteCozmoSing:
     def hit(self):
         #print('hitting')
         self.robot.set_lift_height(1, 500, 20).wait_for_completed()
-        return self.robot.set_lift_height(0, 500, 20)
+        return self.robot.set_lift_height(0.3, 500, 20)
 
     def armsUp(self, speed=5):
         self.robot.set_lift_height(1).wait_for_completed()

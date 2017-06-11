@@ -1,6 +1,8 @@
 import cozmo
 from cozmo.util import Angle
 
+import time
+import csv
 from enum import Enum
 import pygame
 import threading
@@ -86,53 +88,108 @@ class CuteCozmo(CozmoSingleton):
         #     return True
         # return False
 
+def mini_jeu_lire_melodie(cute: CuteCozmo):
+    melodie = list()
+    with open('partition.txt') as f:
+        reader = csv.reader(f, delimiter=' ')
+        for row in reader:
+            for item in row:
+                if item is '' or item.isspace():
+                    break
+                # print('note :', item)
+                melodie.append(int(item))
+    return melodie
+
+
+def mini_jeu_jouer_melodie(cute: CuteCozmo, melodie = None, taille_groupe = 4):
+    if melodie == None:
+        melodie = mini_jeu_lire_melodie()
+    
+    robot = cute.robot
+    # jouer mélodie si complexe
+    if len(melodie) >= taille_groupe:
+        cute.play_partition(melodie)
+        # TODO animation "ok fin de démo"
+    user_succeded = False
+    while not user_succeded:
+        print('start while')
+        # check if user tapped cube
+        for cube in cute.cubes:
+            #print('last tapped :', cube.last_tapped_time)
+            if cube.last_tapped_time is not None:
+                print(cube.last_tapped_time)
+                for c in cute.cubes:
+                    cube.last_tapped_time = None
+                mini_jeu_enregistrer_melodie(cute)
+                return
+        print('no cube tap detected - proceeding')
+        taille_ensemble = 0
+        while taille_ensemble <= len(melodie):
+            cute.play_partition(melodie[:taille_ensemble])
+            # TODO animation "à toi"
+            if not cute.wait_for_partition(melodie[:taille_ensemble]):
+                print('user planted himself')
+                break
+            elif taille_ensemble == len(melodie):
+                print('user a reussi')
+                user_succeded = True
+                break
+            elif len(melodie) - taille_ensemble <= taille_groupe:
+                taille_ensemble = len(melodie)
+            else:
+                taille_ensemble += taille_groupe
+
+def mini_jeu_enregistrer_melodie(cute: CuteCozmo):
+    print('saving a melody')
+    global q
+
+    # empty queue
+    while not q.empty():
+        try:
+            q.get(False)
+        except Empty:
+            continue
+        q.task_done()
+    
+    # wait while not tap
+    tapped = False
+    while not tapped:
+        print('waiting for tap')
+        for cube in cute.cubes:
+            if cube.last_tapped_time is not None:
+                tapped = True
+        if not tapped:
+            time.sleep(1)
+    
+    with open('partition.txt', 'w') as f:
+        while True:
+            try:
+                note = q.get(False)
+            except:
+                break
+            f.write(str(note) + ' ')
+            q.task_done()
+
+
 
 def cozmo_program(robot: cozmo.robot.Robot):
-    # dire_bonjour+s etup
+    # dire_bonjour+setup
     cute = CuteCozmo(robot)
     
     # demo gamme
-    for i in range(8):
-        cute.play_note(i)
+    # for i in range(8):
+    #     cute.play_note(i)
     
     # TODO Animation content, je t'invite a continuer
     #Partie jouer mélodie simple
     melodie = [1,4,7]
-    clair_de_lune = [0,0,0,1,2,1,0,2,1,1,0] # points bonus si tu devines la mélodie à partir des ints
+    #clair_de_lune = [0,0,0,1,2,1,0,2,1,1,0] # points bonus si tu devines la mélodie à partir des ints
+    print('playing simple melody')
+    mini_jeu_jouer_melodie(cute, melodie)
+    mini_jeu_enregistrer_melodie(cute)
 
-    user_succeded = False
-    while not user_succeded:
-        cute.play_partition(melodie)
-        # TODO animation "à toi"
-        user_succeded = cute.wait_for_partition(melodie)
-        if user_succeded:
-            # TODO animation "bravo"
-            break
-        else:
-            pass
-            # TODO animation "tocard"
-    
-    # jouer mélodie complexe
-    cute.play_partition(clair_de_lune)
-    # TODO animation "ok fin de démo"
-    user_succeded = False
-    taille_groupe = 4
-    while not user_succeded:
-        taille_ensemble = taille_groupe
-        while taille_ensemble <= len(clair_de_lune):
-            cute.play_partition(clair_de_lune[:taille_ensemble])
-            # TODO animation "à toi"
-            if not cute.wait_for_partition(clair_de_lune[:taille_ensemble]):
-                break
-            elif taille_ensemble == len(clair_de_lune):
-                user_succeded = True
-                break
-            elif len(clair_de_lune) - taille_ensemble <= taille_groupe:
-                taille_ensemble = len(clair_de_lune)
-            else:
-                taille_ensemble += taille_groupe
-
-
+    cute.play_partition(mini_jeu_lire_melodie(cute))
+    #mini_jeu_jouer_melodie(cute)
             
     # if cute.wait_for_note(1):
     #     print('content !')
